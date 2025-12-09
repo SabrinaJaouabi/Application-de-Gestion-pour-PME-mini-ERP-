@@ -28,6 +28,11 @@ public class SecurityConfig {
 
             .requestMatchers("/api/orders").hasRole("ADMIN")
             .requestMatchers("/api/orders/*").hasAnyRole("ADMIN","USER")
+                    .requestMatchers("/api/invoices/**").hasAnyRole("USER","ADMIN") // Facture pour USER/ADMIN
+            .requestMatchers("/api/invoices").hasRole("ADMIN")                  // GET all invoices
+                        .requestMatchers("/api/dashboard/**").hasRole("ADMIN") // <-- dashboard sécurisé pour ADMIN
+
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);

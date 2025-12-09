@@ -19,7 +19,7 @@ public class Order {
 
     private LocalDateTime orderDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER) 
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -27,5 +27,6 @@ public class Order {
     private List<OrderItem> items;
 
     private BigDecimal totalAmount;
-
+ @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Invoice invoice;
 }

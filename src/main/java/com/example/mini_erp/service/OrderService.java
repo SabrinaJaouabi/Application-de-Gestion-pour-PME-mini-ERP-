@@ -22,44 +22,26 @@ public class OrderService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Order createOrder(Long userId, List<OrderItem> items) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+public Order createOrder(Long userId, List<OrderItem> items) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
+    Order order = new Order();
+    order.setUser(user);
+    order.setOrderDate(LocalDateTime.now());
+    order.setItems(items);
 
-        // Vérifier stock et calculer total
-        for (OrderItem item : items) {
-            Product product = productRepository.findById(item.getProduct().getId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+    items.forEach(item -> item.setOrder(order));
 
-            if (product.getStock() < item.getQuantity()) {
-                throw new RuntimeException("Not enough stock for product " + product.getName());
-            }
+    // ⚡ Calcul du total avec BigDecimal
+    BigDecimal total = items.stream()
+            .map(item -> item.getPrice().multiply(new BigDecimal(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            product.setStock(product.getStock() - item.getQuantity());
-            productRepository.save(product);
+    order.setTotalAmount(total);
 
-            item.setPrice(product.getPrice());
-            item.setProduct(product);
-            totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-        }
-
-        Order order = Order.builder()
-                .user(user)
-                .orderDate(LocalDateTime.now())
-                .items(items)
-                .totalAmount(totalAmount)
-                .build();
-
-        // Lier les items à la commande
-        for (OrderItem item : items) {
-            item.setOrder(order);
-        }
-
-        return orderRepository.save(order);
-    }
-
+    return orderRepository.save(order);
+}
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
@@ -68,10 +50,10 @@ public class OrderService {
         return orderRepository.findByUserId(userId);
     }
 
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-    }
+public Order getOrderById(Long id){
+    return orderRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Commande introuvable"));
+}
 
     public void deleteOrder(Long id) {
         Order order = getOrderById(id);
