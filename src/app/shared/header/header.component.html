@@ -1,0 +1,52 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">Mini-ERP</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <!-- Menu ADMIN -->
+        <li *ngIf="getRole()?.includes('ADMIN')" class="nav-item">
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a>
+        </li>
+        <li *ngIf="getRole()?.includes('ADMIN')" class="nav-item">
+          <a routerLink="/products" routerLinkActive="active" class="nav-link">Produits</a>
+        </li>
+        <li *ngIf="getRole()?.includes('ADMIN')" class="nav-item">
+          <a routerLink="/orders" routerLinkActive="active" class="nav-link">Commandes</a>
+        </li>
+        <li *ngIf="getRole()?.includes('ADMIN')" class="nav-item">
+          <a routerLink="/invoices" routerLinkActive="active" class="nav-link">Factures</a>
+        </li>
+
+        <!-- Menu USER -->
+        <li *ngIf="getRole()?.includes('USER') && !getRole()?.includes('ADMIN')" class="nav-item">
+          <a routerLink="/products" routerLinkActive="active" class="nav-link">Produits</a>
+        </li>
+        <li *ngIf="getRole()?.includes('USER')" class="nav-item">
+          <a routerLink="/my-orders" routerLinkActive="active" class="nav-link">Mes Commandes</a>
+        </li>
+        <li *ngIf="getRole()?.includes('USER')" class="nav-item">
+          <a routerLink="/my-invoices" routerLinkActive="active" class="nav-link">Mes Factures</a>
+        </li>
+      </ul>
+
+      <!-- Partie droite : nom d'utilisateur + logout -->
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li *ngIf="isLoggedIn()" class="nav-item me-3">
+        <span class="navbar-text text-light">
+  Bonjour, <strong>{{ getUsername() || 'Utilisateur' }}</strong>
+</span>
+        </li>
+        <li *ngIf="isLoggedIn()" class="nav-item">
+          <button class="btn btn-outline-light" (click)="logout()">Logout</button>
+        </li>
+        <li *ngIf="!isLoggedIn()" class="nav-item">
+          <a class="btn btn-outline-light" routerLink="/login">Login</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,9 @@
+<div class="container">
+  <h2>Admin Dashboard</h2>
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="stats.totalSales">
+    <p>Total Sales: {{ stats.totalSales | currency:'USD' }}</p>
+    <p>Total Orders: {{ stats.totalOrders }}</p>
+    <p>Total Products: {{ stats.totalProducts }}</p>
+  </div>
+</div>

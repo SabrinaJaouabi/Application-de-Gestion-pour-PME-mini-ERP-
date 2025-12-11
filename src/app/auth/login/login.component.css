@@ -1,0 +1,23 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+}
+
+mat-card {
+  padding: 2rem;
+  width: 400px;
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.error-msg {
+  color: red;
+  margin-bottom: 1rem;
+}

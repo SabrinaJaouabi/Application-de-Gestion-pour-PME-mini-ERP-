@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Confirmer la suppression</h2>
+
+<mat-dialog-content class="mat-typography">
+  <p>Êtes-vous sûr de vouloir supprimer ce produit ?</p>
+  <p class="text-warn"><strong>Cette action est irréversible !</strong></p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button mat-raised-button color="warn" (click)="onConfirm()" cdkFocusInitial>
+    Supprimer
+  </button>
+</mat-dialog-actions>

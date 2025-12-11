@@ -1,0 +1,61 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+/* Espacement uniforme entre les champs */
+mat-form-field {
+  margin-bottom: 20px;
+}
+
+/* Pleine largeur pour tous les champs */
+.full-width {
+  width: 100%;
+}
+
+/* Style pour le groupe de boutons */
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+/* Bouton principal plus visible */
+button[mat-raised-button][color="primary"] {
+  padding: 0 30px;
+  font-size: 16px;
+}
+
+/* Bouton Annuler en secondaire */
+button[mat-button] {
+  font-size: 16px;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+    margin: 10px;
+    border-radius: 8px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+}
