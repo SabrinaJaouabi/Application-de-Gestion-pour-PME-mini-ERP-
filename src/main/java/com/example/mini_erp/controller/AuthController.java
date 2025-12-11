@@ -49,18 +49,26 @@ public Map<String, String> register(@RequestBody Map<String, String> body) {
 }
 
 
-    @PostMapping("/login")
-    public Map<String,String> login(@RequestBody Map<String,String> body){
-        String username = body.get("username");
-        String password = body.get("password");
+ @PostMapping("/login")
+public Map<String, String> login(@RequestBody Map<String, String> body) {
+    String username = body.get("username");
+    String password = body.get("password");
 
-        Optional<User> userOpt = userRepo.findByUsername(username);
-        if(userOpt.isEmpty()) return Map.of("error","Invalid credentials");
-
-        User user = userOpt.get();
-        if(!passwordEncoder.matches(password,user.getPassword())) return Map.of("error","Invalid credentials");
-
-        String token = jwtUtil.generateToken(username);
-        return Map.of("token", token);
+    Optional<User> userOpt = userRepo.findByUsername(username);
+    if (userOpt.isEmpty()) {
+        return Map.of("error", "Invalid credentials");
     }
+
+    User user = userOpt.get();
+
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+        return Map.of("error", "Invalid credentials");
+    }
+
+    // ← CORRECTION ICI : on passe l'objet User complet, pas juste le username
+    String token = jwtUtil.generateToken(user);
+
+    return Map.of("token", token);
+}
+
 }
