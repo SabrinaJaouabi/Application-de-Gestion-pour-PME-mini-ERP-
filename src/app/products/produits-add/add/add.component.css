@@ -59,3 +59,13 @@ button[mat-button] {
     width: 100%;
   }
 }
+.img-preview {
+  max-width: 200px;      /* largeur max */
+  max-height: 200px;     /* hauteur max */
+  object-fit: contain;   /* garde les proportions de l’image */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px;
+  margin-top: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}

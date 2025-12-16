@@ -24,6 +24,8 @@ export class EditComponent implements OnInit {
   productForm: FormGroup;
   productId: number | null = null;
   loading = true;
+  selectedFile: File | null = null;
+  imagePreview: string | null = null; // Pour afficher l'image
 
   constructor(
     private fb: FormBuilder,
@@ -42,7 +44,6 @@ export class EditComponent implements OnInit {
 
   ngOnInit(): void {
     this.productId = Number(this.route.snapshot.paramMap.get('id'));
-
     if (this.productId) {
       this.productService.getProductById(this.productId).subscribe({
         next: (product: Product) => {
@@ -53,6 +54,10 @@ export class EditComponent implements OnInit {
             price: product.price,
             stock: product.stock || 0
           });
+
+          // Afficher l'image existante
+          this.imagePreview = product.imageUrl ? 'http://localhost:8081' + product.imageUrl : null;
+
           this.loading = false;
         },
         error: (err) => {
@@ -65,14 +70,32 @@ export class EditComponent implements OnInit {
     }
   }
 
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.selectedFile = file;
+
+      // Aperçu de l'image
+      const reader = new FileReader();
+      reader.onload = e => this.imagePreview = reader.result as string;
+      reader.readAsDataURL(file);
+    }
+  }
+
   onSubmit(): void {
     if (this.productForm.valid && this.productId) {
-      const updatedProduct: Product = {
-        ...this.productForm.value,
-        id: this.productId
-      };
+      const formData = new FormData();
+      formData.append('name', this.productForm.get('name')?.value);
+      formData.append('sku', this.productForm.get('sku')?.value);
+      formData.append('description', this.productForm.get('description')?.value);
+      formData.append('price', this.productForm.get('price')?.value);
+      formData.append('stock', this.productForm.get('stock')?.value);
 
-      this.productService.updateProduct(this.productId, updatedProduct).subscribe({
+      if (this.selectedFile) {
+        formData.append('image', this.selectedFile);
+      }
+
+      this.productService.updateProductWithImage(this.productId, formData).subscribe({
         next: () => {
           alert('Produit modifié avec succès !');
           this.router.navigate(['/products']);
@@ -88,5 +111,4 @@ export class EditComponent implements OnInit {
   onCancel(): void {
     this.router.navigate(['/products']);
   }
-
 }

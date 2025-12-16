@@ -1,89 +1,74 @@
+/* Container principal */
 .container {
-  max-width: 650px;
-  margin: 40px auto;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
   font-family: 'Roboto', sans-serif;
 }
 
+/* Titres */
 h2 {
+  color: #1976d2; /* bleu Material */
+  margin-bottom: 1.5rem;
   text-align: center;
-  color: #1a237e;
-  margin-bottom: 35px;
-  font-weight: 500;
-  font-size: 28px;
-  letter-spacing: 0.5px;
 }
 
-/* Loading spinner ou message */
+/* Texte de chargement */
 .text-center p {
-  font-size: 18px;
-  color: #666;
+  font-size: 1.1rem;
+  color: #555;
 }
 
-/* Espacement uniforme entre les champs */
-mat-form-field {
-  margin-bottom: 24px;
-}
-
+/* Champs du formulaire */
 .full-width {
   width: 100%;
+  margin-bottom: 1rem;
 }
 
-/* Style des erreurs */
-mat-error {
-  font-size: 12px;
+/* Labels */
+.form-label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
-/* Groupe de boutons */
-.mt-3 {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 40px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
-}
-
-/* Bouton principal */
-button[mat-raised-button][color="primary"] {
-  padding: 0 32px;
-  font-size: 16px;
-  min-width: 180px;
+/* Aperçu de l'image */
+.img-preview {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
   border-radius: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  border: 1px solid #ccc;
 }
 
-/* Bouton Annuler */
-button[mat-button] {
-  font-size: 16px;
-  min-width: 120px;
-  border-radius: 8px;
+/* Boutons */
+button.mat-raised-button {
+  text-transform: none;
+  font-weight: 500;
 }
 
-/* Responsive pour mobile */
-@media (max-width: 600px) {
-  .container {
-    margin: 20px;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  }
+button.mat-button {
+  text-transform: none;
+  font-weight: 500;
+  color: #1976d2;
+}
 
-  h2 {
-    font-size: 24px;
-    margin-bottom: 25px;
-  }
+/* Espacement */
+.mt-3, .mt-4, .mt-5 {
+  margin-top: 1rem;
+}
 
-  .mt-3 {
-    flex-direction: column;
-    gap: 12px;
-  }
+.ms-2 {
+  margin-left: 0.5rem;
+}
 
-  button {
-    width: 100%;
-  }
+/* Inputs */
+input[type="file"] {
+  padding: 6px 12px;
+}
+
+/* Désactivation bouton submit si formulaire invalide */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

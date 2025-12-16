@@ -1,0 +1,12 @@
+<h2 mat-dialog-title class="flex items-center gap-2">
+      <mat-icon color="primary" class="text-3xl">check_circle</mat-icon>
+      {{ data.title || 'Succès' }}
+    </h2>
+    <mat-dialog-content>
+      <p class="text-lg" [innerHTML]="data.message"></p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-raised-button color="primary" mat-dialog-close>
+        {{ data.confirmText || 'OK' }}
+      </button>
+    </mat-dialog-actions>

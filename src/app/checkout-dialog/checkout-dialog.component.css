@@ -1,0 +1,9 @@
+.recap-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .recap-table th {
+      color: #444;
+      font-weight: 600;
+    }
+    .text-lg { font-size: 1.125rem; }

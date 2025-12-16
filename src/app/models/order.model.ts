@@ -5,6 +5,11 @@ export interface Order {
   id: number;
   orderDate: string;
   user: User;
-  items: OrderItem[];
+    paid: boolean;
+  items: any[];
   totalAmount: number;
+   invoice?: {
+    fileName: string;
+  };
 }
+

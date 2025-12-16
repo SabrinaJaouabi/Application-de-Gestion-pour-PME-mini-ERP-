@@ -1,1 +1,45 @@
-<p>invoices-list works!</p>
+<!-- src/app/components/my-invoices/my-invoices.component.html -->
+<div class="container mt-5">
+  <h2>Mes Factures</h2>
+
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && invoices.length === 0" class="alert alert-info">
+    Aucune facture trouvée. Passez une commande pour en générer une !
+  </div>
+
+  <div *ngIf="!loading && invoices.length > 0">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>N° Facture</th>
+            <th>Date de commande</th>
+            <th>Date de création</th>
+            <th>Montant total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let invoice of invoices">
+            <td>{{ invoice.id }}</td>
+            <td>{{ invoice.order.orderDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ invoice.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ invoice.order.totalAmount }} DT</td>
+            <td>
+              <button 
+                class="btn btn-primary btn-sm"
+                (click)="downloadInvoice(invoice)">
+                <i class="bi bi-download"></i> Télécharger PDF
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

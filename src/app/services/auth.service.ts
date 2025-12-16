@@ -18,39 +18,48 @@ export class AuthService {
     this.loadUserFromStorage();
   }
 
-  login(credentials: { username: string; password: string }): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/login`, credentials).pipe(
-      map(res => {
-        if (res && res.token) {
-          // 1. On sauvegarde le token
-          localStorage.setItem('token', res.token);
+ login(credentials: { username: string; password: string }): Observable<any> {
+  return this.http.post<any>(`${this.API_URL}/login`, credentials).pipe(
+    map(res => {
+      if (res && res.token) {
+        localStorage.setItem('token', res.token);
 
-          // 2. On décode le token pour récupérer les infos
-          const payload = this.decodeToken(res.token);
+        // 1. Décoder le token
+        const payload = this.decodeToken(res.token);
 
-          // 3. On récupère le username (presque toujours dans "sub")
-          const username = payload.sub || payload.username || credentials.username;
+        // 2. Extraire les infos du payload
+        const username = payload.sub || payload.username || credentials.username;
+        
+        // ← NOUVEAU : Récupérer l'ID depuis le token (très fréquent : "userId", "id", ou "sub")
+        let userId: number | null = null;
+        if (payload.userId) userId = Number(payload.userId);
+        else if (payload.id) userId = Number(payload.id);
+        else if (payload.sub && !isNaN(Number(payload.sub))) userId = Number(payload.sub);
 
-          // 4. On récupère le rôle
-          let role = 'ROLE_USER';
-          if (payload.role) role = payload.role;
-          else if (payload.roles && payload.roles.length > 0) role = payload.roles[0];
-          else if (payload.authorities && payload.authorities.length > 0) role = payload.authorities[0].authority || payload.authorities[0];
+        // 3. Récupérer le rôle
+        let role = 'ROLE_USER';
+        if (payload.role) role = payload.role;
+        else if (payload.roles?.length > 0) role = payload.roles[0];
+        else if (payload.authorities?.length > 0) role = payload.authorities[0].authority || payload.authorities[0];
+        else if (payload.scope) role = payload.scope.includes('ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER';
 
-          // 5. On crée l'objet utilisateur
-          const user = { username, role };
+        // 4. Créer l'objet user COMPLET avec l'ID
+        const user = { 
+          id: userId,        // ← IMPORTANT : on ajoute l'id
+          username, 
+          role 
+        };
 
-          // 6. On sauvegarde tout
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
+        // 5. Sauvegarde
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
 
-          console.log('Connecté avec :', user); // Tu verras ça dans la console
-        }
-        return res;
-      })
-    );
-  }
-
+        console.log('Utilisateur connecté :', user); // Tu verras l'id ici
+      }
+      return res;
+    })
+  );
+}
   // Méthode pour décoder le token
   private decodeToken(token: string): any {
     try {
@@ -97,4 +106,31 @@ export class AuthService {
   register(userData: any) {
     return this.http.post(`${this.API_URL}/register`, userData);
   }
+
+
+// Ajoute ces méthodes publiques
+getCurrentUser(): any {
+  return this.currentUserSubject.value;
+}
+
+getCurrentUserId(): number | null {
+  const user = this.currentUserSubject.value;
+  return user?.id ? Number(user.id) : null;
+}
+
+getCurrentUsername(): string | null {
+  const user = this.currentUserSubject.value;
+  return user?.username || null;
+}
+
+getCurrentRole(): string | null {
+  const user = this.currentUserSubject.value;
+  return user?.role || null;
+}
+getUser() {
+  const userString = localStorage.getItem('user');
+  if (!userString) return null;
+  return JSON.parse(userString);
+}
+
 }

@@ -1,0 +1,43 @@
+.invoices-container {
+  margin: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.loading, .error, .no-data {
+  margin: 10px 0;
+  font-weight: bold;
+  color: #555;
+}
+
+.error {
+  color: red;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.invoice-table th, .invoice-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.invoice-table th {
+  background-color: #f5f5f5;
+}
+
+button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}

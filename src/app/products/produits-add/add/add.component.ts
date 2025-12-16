@@ -6,16 +6,26 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../../services/product.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-add',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule,RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    RouterLink
+  ],
   templateUrl: './add.component.html',
-  styleUrl: './add.component.css'
+  styleUrls: ['./add.component.css']
 })
 export class AddComponent {
   productForm: FormGroup;
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -23,21 +33,68 @@ export class AddComponent {
     private router: Router
   ) {
     this.productForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(2)]],
       sku: ['', Validators.required],
       description: [''],
-      price: ['', [Validators.required, Validators.min(0)]],
-      stock: [0]
+      price: [null, [Validators.required, Validators.min(0.01)]],
+      stock: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
-  onSubmit(): void {
-    if (this.productForm.valid) {
-      this.productService.createProduct(this.productForm.value).subscribe({
-        next: () => this.router.navigate(['/products']),
-        error: (err) => alert('Erreur lors de la création')
-      });
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    // Limite taille (optionnel)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image trop lourde (max 10 Mo)');
+      return;
     }
+
+    // Vérifier type image
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner une image valide');
+      return;
+    }
+
+    this.selectedFile = file;
+
+    // Aperçu
+    const reader = new FileReader();
+    reader.onload = () => this.imagePreview = reader.result as string;
+    reader.readAsDataURL(file);
   }
 
+  async onSubmit(): Promise<void> {
+    if (this.productForm.invalid) {
+      this.productForm.markAllAsTouched();
+      return;
+    }
+
+    const formData = new FormData();
+
+    // Ajouter tous les champs texte
+    formData.append('name', this.productForm.get('name')!.value.trim());
+    formData.append('sku', this.productForm.get('sku')!.value.trim());
+    formData.append('description', this.productForm.get('description')!.value || '');
+    formData.append('price', this.productForm.get('price')!.value.toString());
+    formData.append('stock', this.productForm.get('stock')!.value.toString());
+
+    // Ajouter l'image si sélectionnée
+    if (this.selectedFile) {
+      formData.append('image', this.selectedFile, this.selectedFile.name);
+    }
+
+    this.productService.createProduct(formData).subscribe({
+      next: (product) => {
+        alert('Produit ajouté avec succès !');
+        this.router.navigate(['/products']);
+      },
+      error: (err) => {
+        console.error('Erreur création produit', err);
+        const msg = err.error?.message || err.message || 'Erreur inconnue lors de la création.';
+        alert('Erreur : ' + msg);
+      }
+    });
+  }
 }
