@@ -3,6 +3,7 @@ package com.example.mini_erp.service;
 import com.example.mini_erp.model.Invoice;
 import com.example.mini_erp.model.Order;
 import com.example.mini_erp.model.OrderItem;
+import com.example.mini_erp.model.User;
 import com.example.mini_erp.repository.InvoiceRepository;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -19,7 +20,9 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +63,7 @@ public class InvoiceService {
             for (OrderItem item : order.getItems()) {
                 table.addCell(item.getProduct().getName());
                 table.addCell(item.getQuantity().toString());
-                table.addCell(item.getProduct().getPrice().toString());
+                table.addCell(item.getProduct().getPrice().toString()+ " DT");
                 BigDecimal itemTotal = item.getProduct().getPrice()
                         .multiply(new BigDecimal(item.getQuantity()));
                 table.addCell(itemTotal.toString());
@@ -69,7 +72,7 @@ public class InvoiceService {
 
             document.add(table);
             document.add(new Paragraph("\n"));
-            document.add(new Paragraph("Montant Total: " + totalAmount));
+document.add(new Paragraph("Montant Total: " + totalAmount + " DT"));
 
             document.close();
             return baos.toByteArray();
@@ -83,22 +86,22 @@ public class InvoiceService {
     /**
      * Générer et sauvegarder la facture
      */
-    public Invoice generateAndSaveInvoice(Order order) throws Exception {
-        byte[] pdfBytes = generateInvoicePdf(order);
+    // public Invoice generateAndSaveInvoice(Order order) throws Exception {
+    //     byte[] pdfBytes = generateInvoicePdf(order);
 
-        String fileName = "facture_" + order.getId() + ".pdf";
-        Path path = Paths.get("invoices/" + fileName);
-        Files.createDirectories(path.getParent());
-        Files.write(path, pdfBytes);
+    //     String fileName = "facture_" + order.getId() + ".pdf";
+    //     Path path = Paths.get("invoices/" + fileName);
+    //     Files.createDirectories(path.getParent());
+    //     Files.write(path, pdfBytes);
 
-        Invoice invoice = Invoice.builder()
-                .order(order)
-                .createdAt(order.getOrderDate())
-                .fileName(fileName)
-                .build();
+    //     Invoice invoice = Invoice.builder()
+    //             .order(order)
+    //             .createdAt(order.getOrderDate())
+    //             .fileName(fileName)
+    //             .build();
 
-        return invoiceRepository.save(invoice);
-    }
+    //     return invoiceRepository.save(invoice);
+    // }
 
     /**
      * Récupérer le PDF d’une facture existante
@@ -114,4 +117,40 @@ public class InvoiceService {
     public java.util.List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
     }
+
+    public Invoice generateAndSaveInvoice(Order order) {
+
+    try {
+        // 1️⃣ Générer le PDF
+        byte[] pdfBytes = generateInvoicePdf(order);
+
+        // 2️⃣ Nom du fichier
+        String fileName = "facture_" + order.getId() + ".pdf";
+
+        // 3️⃣ Dossier invoices/
+        Path path = Paths.get("invoices").resolve(fileName);
+        Files.createDirectories(path.getParent());
+        Files.write(path, pdfBytes);
+
+        // 4️⃣ Créer l'objet Invoice
+        Invoice invoice = Invoice.builder()
+                .order(order)
+                .createdAt(LocalDateTime.now())
+                .fileName(fileName)
+                .build();
+
+        // 5️⃣ Lier facture ↔ commande
+        order.setInvoice(invoice);
+
+        // 6️⃣ Sauvegarder facture
+        return invoiceRepository.save(invoice);
+
+    } catch (Exception e) {
+        throw new RuntimeException("Erreur génération facture", e);
+    }
+}
+public List<Invoice> getInvoicesByUser(User user) {
+    return invoiceRepository.findByOrderUser(user);
+}
+
 }

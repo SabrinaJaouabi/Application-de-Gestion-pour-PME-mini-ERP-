@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,15 +29,22 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
           .authorizeHttpRequests(auth -> auth
     .requestMatchers("/api/auth/**").permitAll()
-    // .requestMatchers("/api/products").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-    // .requestMatchers("/api/products/**").hasAuthority("ROLE_ADMIN")
-    // Commandes
-    .requestMatchers("/api/orders/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-    .requestMatchers("/api/orders").hasAuthority("ROLE_ADMIN")
-    .requestMatchers("/api/orders/*").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
-    .requestMatchers("/api/invoices/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-    .requestMatchers("/api/invoices").hasAuthority("ROLE_ADMIN")
-    .requestMatchers("/api/dashboard/**").hasAuthority("ROLE_ADMIN")
+    .requestMatchers("/uploads/**").permitAll()
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+    // Orders
+    .requestMatchers("/api/orders").hasRole("ADMIN")
+    .requestMatchers("/api/orders/**").hasAnyRole("ADMIN", "USER")
+
+    // Invoices
+    .requestMatchers("/api/invoices").hasRole("ADMIN") // liste toutes (GET sans param)
+    .requestMatchers("/api/invoices/my").hasAnyRole("USER", "ADMIN")
+    .requestMatchers("/api/invoices/**").hasAnyRole("USER", "ADMIN") // tout le reste (create, download, etc.)
+
+    // Autres
+    .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
+    .requestMatchers("/api/products/upload/**").hasRole("ADMIN")
+
     .anyRequest().authenticated()
 )
             .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);

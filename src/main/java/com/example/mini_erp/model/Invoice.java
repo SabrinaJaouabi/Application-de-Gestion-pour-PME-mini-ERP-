@@ -13,11 +13,12 @@ public class Invoice {
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private Order order;
 
     private LocalDateTime createdAt;
 
     private String fileName; // nom du PDF
+@OneToOne
+@JoinColumn(name = "order_id")
+private Order order;
 
 }

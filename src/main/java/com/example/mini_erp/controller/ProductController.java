@@ -1,49 +1,55 @@
 package com.example.mini_erp.controller;
+import com.example.mini_erp.dto.ProductRequestDTO;
 import com.example.mini_erp.model.Product;
+import com.example.mini_erp.service.FileService;
 import com.example.mini_erp.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-
+import java.util.UUID;
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
+
     private final ProductService productService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public List<Product> getAll() {
+        return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+    public Product getById(@PathVariable Long id) {
+        return productService.getProductById(id);
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        return ResponseEntity.ok(productService.createProduct(product));
+    @PreAuthorize("hasRole('ADMIN')")
+    public Product create(@ModelAttribute ProductRequestDTO dto) throws IOException {
+        return productService.createProduct(dto);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    @PreAuthorize("hasRole('ADMIN')")
+    public Product update(@PathVariable Long id, @ModelAttribute ProductRequestDTO dto) throws IOException {
+        return productService.updateProduct(id, dto);
     }
 
-  @DeleteMapping("/{id}")
-@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
-    productService.deleteProduct(id);
-    return ResponseEntity.ok(Map.of("message", "Product deleted successfully"));
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) throws IOException {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
 }
-}
-

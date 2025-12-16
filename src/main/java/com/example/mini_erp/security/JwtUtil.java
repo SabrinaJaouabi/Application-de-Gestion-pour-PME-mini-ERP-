@@ -81,7 +81,8 @@ public class JwtUtil {
     // Nouvelle méthode pour générer le token avec le rôle
 public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("role", user.getRole()); // ← On ajoute le rôle dans le token !
+    claims.put("role", user.getRole());
+    claims.put("userId", user.getId());  // ← LIGNE AJOUTÉE : on met l'ID dans le token !
 
     return Jwts.builder()
             .setClaims(claims)

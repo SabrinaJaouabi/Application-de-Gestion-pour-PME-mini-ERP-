@@ -17,13 +17,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-
- @Override
+@Override
 protected void doFilterInternal(HttpServletRequest request,
                                 HttpServletResponse response,
                                 FilterChain filterChain) throws ServletException, IOException {
 
-    System.out.println(">>> JwtAuthenticationFilter appelé pour : " + request.getRequestURI());
+    String path = request.getRequestURI();
+
+    // Ignorer certaines URL
+  if (path.startsWith("/uploads/") || path.startsWith("/api/auth/")) {
+    filterChain.doFilter(request, response);
+    return;
+}
+
+
+    System.out.println(">>> JwtAuthenticationFilter appelé pour : " + path);
 
     String authHeader = request.getHeader("Authorization");
     String token = null;
